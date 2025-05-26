@@ -27,7 +27,7 @@ const register=async (req,res)=>{
 
     }
     catch(err){
-        res.status(400).send("Error:",err)
+        res.status(400).send("Error:"+err)
     }
 }
 
@@ -44,9 +44,12 @@ const login=async(req,res)=>{
             throw new Error("Invalid Credentials")
         }
         
-       const user = User.findOne({emailId})
+       const user = await User.findOne({emailId})
 
-       const ans = bcrypt.compare(password,user.password)
+       if(!user)
+        throw new Error("User Not Found")
+
+       const ans = await bcrypt.compare(password,user.password)
 
        if(!ans)
         throw new Error("Invalid Credentials")
@@ -58,6 +61,18 @@ const login=async(req,res)=>{
         res.status(200).send("LoggedIn Sucessfully")
     }
     catch(err){
-        res.status(401).send("Error:",err)
+        res.status(401).send("Error:"+err)
     }
 }
+
+const logout = async(req,res)=>{
+
+    try{
+          
+    }
+    catch{
+
+    }
+}
+
+export {register,login}
