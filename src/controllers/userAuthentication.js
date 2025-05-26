@@ -30,3 +30,34 @@ const register=async (req,res)=>{
         res.status(400).send("Error:",err)
     }
 }
+
+const login=async(req,res)=>{
+    try{
+        const {emailId,password}=req.body
+
+        if(!emailId)
+        {
+            throw new Error("Invalid Credentials")
+        }
+        if(!password)
+        {
+            throw new Error("Invalid Credentials")
+        }
+        
+       const user = User.findOne({emailId})
+
+       const ans = bcrypt.compare(password,user.password)
+
+       if(!ans)
+        throw new Error("Invalid Credentials")
+
+       const token = jwt.sign({_id:user._id,emailId:emailId},process.env.KEY,{expiresIn:60*60})
+
+        res.cookie('token',token,{maxAge:60*60*1000})   
+
+        res.status(200).send("LoggedIn Sucessfully")
+    }
+    catch(err){
+        res.status(401).send("Error:",err)
+    }
+}
