@@ -21,7 +21,7 @@ const register=async (req,res)=>{
 
         const user=await User.create(req.body)
 
-        const token = jwt.sign({_id:user._id,emailId:emailId},process.env.KEY,{expiresIn:60*60})
+        const token = jwt.sign({_id:user._id,emailId:emailId,role:'user'},process.env.KEY,{expiresIn:60*60})
 
         res.cookie('token',token,{maxAge:60*60*1000})    //frontend
 
@@ -57,7 +57,7 @@ const login=async(req,res)=>{
        if(!ans)
         throw new Error("Invalid Credentials")
 
-       const token = jwt.sign({_id:user._id,emailId:emailId},process.env.KEY,{expiresIn:60*60})
+       const token = jwt.sign({_id:user._id,emailId:emailId,role:user.role},process.env.KEY,{expiresIn:60*60})
 
         res.cookie('token',token,{maxAge:60*60*1000})   
 
@@ -91,4 +91,32 @@ const logout = async(req,res)=>{
     }
 }
 
-export {register,login,logout}
+const adminRegister= async (req,res)=>{
+    try
+    {
+
+        //Validate the Data
+        validate(req.body)
+        
+        const {firstName,emailId,password} =req.body
+
+        req.body.password = await bcrypt.hash(password,10)
+
+        req.body.role="admin";
+
+        const user=await User.create(req.body)
+
+        const token = jwt.sign({_id:user._id,emailId:emailId,role:'admin'},process.env.KEY,{expiresIn:60*60})
+
+        res.cookie('token',token,{maxAge:60*60*1000})   
+
+        res.status(201).send("User Registrerd Sucessfully")
+         
+
+    }
+    catch(err){
+        res.status(400).send("Error:"+err)
+    }
+}
+
+export {register,login,logout,adminRegister}
