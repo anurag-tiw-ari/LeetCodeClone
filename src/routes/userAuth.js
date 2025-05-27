@@ -1,6 +1,7 @@
 import express from "express";
-import { register,login,logout } from "../controllers/userAuthentication.js";
+import { register,login,logout,adminRegister } from "../controllers/userAuthentication.js";
 import userMidddleware from "../middleware/userMiddleware.js";
+import adminMiddleware from "../middleware/adminMiddleware.js";
 
 const authRouter=express.Router();
 
@@ -8,9 +9,14 @@ const authRouter=express.Router();
 
 authRouter.post('/register',register)
 
+// Register Admin
+
+authRouter.post('/admin/register',adminMiddleware,adminRegister)
+
 //Login
 
 authRouter.post('/login',login)
+
 
 //LogOut
 
