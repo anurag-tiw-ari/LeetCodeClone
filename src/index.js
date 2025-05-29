@@ -5,6 +5,7 @@ import main from "./config/db.js";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/userAuth.js";
 import redisClient from "./config/redis.js";
+import problemRouter from "./routes/problemCreator.js";
 
 const app=express()
 
@@ -12,6 +13,7 @@ app.use(express.json())
 app.use(cookieParser())
 
 app.use("/user",authRouter)
+app.use("/problem",problemRouter)
 
 
 const InitializeConnection= async()=>{
