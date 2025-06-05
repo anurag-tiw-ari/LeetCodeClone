@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
 
+
 const userSchema=new Schema({
     firstName:{
         type:String,
@@ -32,7 +33,11 @@ const userSchema=new Schema({
         default:'user'
     },
     problemSolved:{
-        type:[String]
+        type:[{
+            type:Schema.Types.ObjectId,
+            ref:"problem"
+        }],
+        unique:true
     },
     password:{
         type:String,
