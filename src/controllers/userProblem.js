@@ -1,4 +1,5 @@
 import Problem from "../models/problem.js";
+import Submission from "../models/submission.js";
 import User from "../models/user.js";
 import {getLanguageById,submitBatch,submitToken} from "../utils/problemUtility.js";
 
@@ -238,7 +239,29 @@ const solvedProblemsByUser = async (req,res)=>
             res.status(400).send("Error:"+err)
         }
 }
-    
+
+const submittedProblem = async (req,res)=>{
+    try
+    {
+            
+        const userId = req.result._id;
+        const problemId = req.params.id;
+
+        const ans = await Submission.find({userId,problemId})
+
+        if(ans.length==0)
+        {
+            res.status(200).send("No Submissions")
+        }
+
+        res.status(200).send(ans)
+
+    }
+    catch(err)
+    {
+        res.status(400).send("Error"+err)
+    }
+}
 
 
-export {createProblem,updateProblem,deleteProblem,getProblemById,getAllProblems,solvedProblemsByUser}
+export {createProblem,updateProblem,deleteProblem,getProblemById,getAllProblems,solvedProblemsByUser,submittedProblem}

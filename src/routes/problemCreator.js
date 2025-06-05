@@ -6,7 +6,7 @@
 
 import express from "express";
 import adminMiddleware from "../middleware/adminMiddleware.js";
-import {createProblem,updateProblem,deleteProblem,getProblemById,getAllProblems,solvedProblemsByUser} from "../controllers/userProblem.js";
+import {createProblem,updateProblem,deleteProblem,getProblemById,getAllProblems,solvedProblemsByUser,submittedProblem} from "../controllers/userProblem.js";
 import userMidddleware from "../middleware/userMiddleware.js";
 
 const problemRouter = express.Router();
@@ -36,5 +36,9 @@ problemRouter.delete("/delete/:id",adminMiddleware,deleteProblem)
 //Problems Solved By Particular User
 
 problemRouter.get("/user",userMidddleware,solvedProblemsByUser)
+
+//Submitted Code by particular user for a particular problem
+
+problemRouter.get("/submittedProblem/:id",userMidddleware,submittedProblem)
 
 export default problemRouter
