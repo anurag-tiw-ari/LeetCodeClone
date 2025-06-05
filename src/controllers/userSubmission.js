@@ -2,6 +2,7 @@ import Problem from "../models/problem.js";
 import { getLanguageById } from "../utils/problemUtility.js";
 import Submission from "../models/submission.js";
 import { submitBatch,submitToken } from "../utils/problemUtility.js";
+import User from "../models/user.js";
 
 const submitCode= async(req,res)=>
     {
@@ -98,7 +99,7 @@ const submitCode= async(req,res)=>
                let errorMessage=null
                let testCasesPassed=0;
 
-               console.log(testResult)
+               // console.log(testResult)
 
                for(const test of testResult)
                {
@@ -130,6 +131,14 @@ const submitCode= async(req,res)=>
 
                await submittedResult.save();
 
+              const isInclude = req.result.problemSolved.includes(problemId);
+
+              if(!isInclude)
+              {
+                  req.result.problemSolved.push(problemId);
+                  await req.result.save();
+              }
+
 
             res.status(201).send(submittedResult)
          }
@@ -140,5 +149,74 @@ const submitCode= async(req,res)=>
 
     }
 
+const runCode = async(req,res)=>{
+    try
+    {
+         const userId=req.result._id;
 
-export {submitCode}
+         const problemId=req.params.id;
+
+         const {code,language}=req.body;
+
+         if(!userId || !problemId || !code || !language)
+         {
+            throw new Error("Some Field are missing")
+         }
+
+         const dsaProblem=await Problem.findById(problemId);
+
+         if(!dsaProblem)
+         {
+           throw new Error("Problem Not Found")
+         }
+
+         const {visibleTestCases, hiddenVisibleTestCases}=dsaProblem;
+
+           //JUDGE0
+         
+           //source_code:
+           //language_id:
+           //stdin:
+           //expectedOutput:
+
+           const languageId=getLanguageById(language);
+
+
+           const submissions=visibleTestCases.map((curr)=>{
+           return {
+               source_code:code,
+               language_id:languageId,
+               stdin:curr.input,
+               expected_output:curr.output
+           }
+           })
+
+           const submitResult = await submitBatch(submissions)
+
+       //  console.log(submitResult)
+
+           let tokenStr='';
+
+           for(const element of submitResult)
+           {
+           const {token} = element;
+           
+           tokenStr += token + ',';
+
+           }
+
+           const testResult = await submitToken(tokenStr)
+
+          // console.log(testResult)
+
+
+          res.status(201).send(testResult)
+    }
+    catch(err)
+    {
+       res.status(401).send("Error:"+err)
+    }
+}
+
+
+export {submitCode,runCode}
