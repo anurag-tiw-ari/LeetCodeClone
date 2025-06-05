@@ -1,5 +1,5 @@
 import express from "express";
-import { register,login,logout,adminRegister } from "../controllers/userAuthentication.js";
+import { register,login,logout,adminRegister,deleteProfile } from "../controllers/userAuthentication.js";
 import userMidddleware from "../middleware/userMiddleware.js";
 import adminMiddleware from "../middleware/adminMiddleware.js";
 
@@ -25,5 +25,9 @@ authRouter.post('/logout',userMidddleware,logout)
 //GetProfile
 
 //authRouter.get('/getProfile',getProfile)
+
+//DeleteProfile
+
+authRouter.delete('/deleteprofile',userMidddleware,deleteProfile)
 
 export default authRouter

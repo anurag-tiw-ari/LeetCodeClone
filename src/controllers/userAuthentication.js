@@ -3,6 +3,7 @@ import validate from "../utils/validator.js"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import redisClient from "../config/redis.js"
+import Submission from "../models/submission.js"
 
 
 const register=async (req,res)=>{
@@ -117,5 +118,31 @@ const adminRegister= async (req,res)=>{
     }
 }
 
+const deleteProfile = async (req,res)=>{
+   try{
+        const userId = req.result._id;
 
-export {register,login,logout,adminRegister}
+        if(!userId)
+        {
+            throw new Error("User Does Not Exist")
+        }
+
+        await  User.findByIdAndDelete(userId);
+
+        await Submission.deleteMany({userId});
+
+        res.status(200).send("Deleted Successfully");
+
+
+
+
+   }
+   catch(err)
+   {
+        res.status(400).send("Error:"+err);
+
+   }
+}
+
+
+export {register,login,logout,adminRegister,deleteProfile}
