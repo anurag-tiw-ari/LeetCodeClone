@@ -1,7 +1,12 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUser } from '../authSlice';
+import { useEffect } from 'react';
+import { toast } from "react-toastify";
+import GridBackground from '../Components/GridBackground';
 
 const signupSchema = z.object({
   firstName: z.string().min(3, "Minimum character should be 3"),
@@ -15,34 +20,65 @@ const signupSchema = z.object({
 });
 
 function SignUpPage() {
+
+  const navigate = useNavigate();
+
+  const {isAuthenticated, loading, error} = useSelector((state)=>state.auth)
+
+//   useEffect(()=>{
+//     if(isAuthenticated)
+//     {
+//         navigate("/")
+//     }
+//   },[isAuthenticated])
+
+
+  useEffect(()=>{
+    
+    if(error)
+    {
+        toast.error(error)
+    }
+  },[error])
+
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: zodResolver(signupSchema) });
 
+  const dispatch = useDispatch();
+
   const onSubmit = (data) => {
     console.log(data);
 
     // Backend data ko send kar dena chaiye?
+
+    dispatch(registerUser(data));
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-base-300 " 
-    style={{
-        backgroundImage: `
-          linear-gradient(to bottom right,#1f1f1f,#000
-      )
-        `,
-        backgroundSize: '48px 48px',
-        backgroundRepeat: 'repeat',
-        backdropFilter: 'blur(2px)',
-      }}> 
-       <div className="absolute top-0 left-0 w-full h-36 pointer-events-none" 
+    <>
+    
+    <div className="min-h-screen flex items-center justify-center p-4" 
+    // style={{
+    //     backgroundImage: `
+    //       linear-gradient(to bottom right,#1f1f1f,#000
+    //   )
+    //     `,
+    //     backgroundSize: '48px 48px',
+    //     backgroundRepeat: 'repeat',
+    //     backdropFilter: 'blur(2px)',
+    //   }}
+     > 
+       {/* <div className="absolute top-0 left-0 w-full h-36 pointer-events-none" 
     style={{
       background: 'linear-gradient(to bottom, #111 0% , transparent 100%)'
     }} 
-  />
+  /> */}
+
+      <GridBackground />
       <div className="card w-96 bg-base-100 shadow-xl hover:shadow-indigo-600/40"> 
         <div className="card-body">
           <h2 className="card-title justify-center text-2xl font-bold text-indigo-500 hover:text-indigo-700">CODING PLATFORM</h2>
@@ -97,8 +133,9 @@ function SignUpPage() {
               <button
                 type="submit"
                 className="btn btn-primary"
+                disabled={loading}
               >
-                Sign Up
+                {loading ? "Signing Up" : "Sign Up"}
               </button>
             </div>
           </form>
@@ -109,6 +146,7 @@ function SignUpPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
