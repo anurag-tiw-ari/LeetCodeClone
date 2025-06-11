@@ -9,7 +9,7 @@ function HomePage()
                 <h1 className="lg:text-5xl sm:text-4xl text-3xl font-bold uppercase text-center">
             Master <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-transparent bg-clip-text">Data Structures And Algorithms</span>
             </h1>
-            <p className="text-center text-2xl my-6">One click away</p>
+            <p className="text-center text-2xl my-6">You Are One Click Away</p>
              <svg
                className="size-6 animate-bounce text-indigo-500 motion-reduce:animate-none text-center"
                fill="none"
