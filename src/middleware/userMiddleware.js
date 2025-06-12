@@ -8,14 +8,14 @@ const userMidddleware=async(req,res,next)=>{
         const {token}=req.cookies
 
         if(!token)
-            throw new Error("Token is not Present")
+            throw new Error("First Login Or Register")
 
         const payload = jwt.verify(token,process.env.KEY)
 
         const {_id} = payload
 
         if(!_id)
-            throw new Error("Invalid Token")
+            throw new Error("Invalid Credentials")
 
         const result = await User.findById(_id)
 
@@ -36,7 +36,7 @@ const userMidddleware=async(req,res,next)=>{
     }
     catch(err)
     {
-         res.send("Error:"+err.message)
+         res.status(400).send("Error:"+err.message)
     }
 }
 

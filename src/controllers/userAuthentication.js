@@ -16,6 +16,13 @@ const register=async (req,res)=>{
         
         const {firstName,emailId,password} =req.body
 
+        const userExist = await User.find({emailId})
+
+        if(userExist.length!=0)
+        {
+            throw new Error("User already Exist With this Email Id")
+        }
+
         req.body.password = await bcrypt.hash(password,10)
 
         req.body.role="user";
@@ -24,14 +31,24 @@ const register=async (req,res)=>{
 
         const token = jwt.sign({_id:user._id,emailId:emailId,role:'user'},process.env.KEY,{expiresIn:60*60})
 
+        const reply = {
+            firstName:user.firstName,
+            emailId:user.emailId,
+            _id:user._id,
+            role:user.role
+           }
+
         res.cookie('token',token,{maxAge:60*60*1000})    //frontend
 
-        res.status(201).send("User Registrerd Sucessfully")
+        res.status(201).json({
+            user:reply,
+            message:"LogedIn Successfully"
+        })
          
 
     }
     catch(err){
-        res.status(400).send("Error:"+err)
+        res.status(400).send("Error:"+err.message)
     }
 }
 
@@ -58,11 +75,21 @@ const login=async(req,res)=>{
        if(!ans)
         throw new Error("Invalid Credentials")
 
+       const reply = {
+        firstName:user.firstName,
+        emailId:user.emailId,
+        _id:user._id,
+        role:user.role
+       }
+
        const token = jwt.sign({_id:user._id,emailId:emailId,role:user.role},process.env.KEY,{expiresIn:60*60})
 
         res.cookie('token',token,{maxAge:60*60*1000})   
 
-        res.status(200).send("LoggedIn Sucessfully")
+        res.status(201).json({
+            user:reply,
+            message:"LogedIn Successfully"
+        })
     }
     catch(err){
         res.status(401).send("Error:"+err)
@@ -143,6 +170,8 @@ const deleteProfile = async (req,res)=>{
 
    }
 }
+
+
 
 
 export {register,login,logout,adminRegister,deleteProfile}

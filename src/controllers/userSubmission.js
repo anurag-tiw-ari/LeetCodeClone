@@ -48,15 +48,18 @@ const submitCode= async(req,res)=>
 
                 const languageId=getLanguageById(language);
 
+                const encodeBase64 = (str) => Buffer.from(str, 'utf-8').toString('base64');
 
                 const submissions=hiddenVisibleTestCases.map((curr)=>{
                 return {
-                    source_code:code,
+                    source_code:encodeBase64(code),
                     language_id:languageId,
-                    stdin:curr.input,
-                    expected_output:curr.output
+                    stdin:encodeBase64(curr.input),
+                    expected_output:encodeBase64(curr.output)
                 }
                 })
+
+                console.log("submissions", submissions)
 
                 const submitResult = await submitBatch(submissions)
 
@@ -114,11 +117,11 @@ const submitCode= async(req,res)=>
                     if(test.status_id==4)
                     {
                         status='wrong answer'
-                        errorMessage = test.stderr
+                        errorMessage = test.status.description
                     }
                     else {
                         status='error'
-                        errorMessage = test.stderr
+                        errorMessage = test.status.description
                     }
                 }
                }
@@ -135,12 +138,20 @@ const submitCode= async(req,res)=>
 
               if(!isInclude)
               {
+                  if(status==='accepted')
                   req.result.problemSolved.push(problemId);
                   await req.result.save();
               }
 
+              const accepted = (status==='accepted')
 
-            res.status(201).send(submittedResult)
+            res.status(201).json({
+                accepted,
+                testCasesTotal:hiddenVisibleTestCases.length,
+                testCasesPassed,
+                runTime,
+                memory
+            })
          }
          catch(err)
          {
@@ -181,36 +192,56 @@ const runCode = async(req,res)=>{
 
            const languageId=getLanguageById(language);
 
+           const encodeBase64 = (str) => Buffer.from(str, 'utf-8').toString('base64');
 
            const submissions=visibleTestCases.map((curr)=>{
            return {
-               source_code:code,
+               source_code:encodeBase64(code),
                language_id:languageId,
-               stdin:curr.input,
-               expected_output:curr.output
+               stdin:encodeBase64(curr.input),
+               expected_output:encodeBase64(curr.output)
            }
            })
 
+          // console.log("submissions", submissions)
+
+           if(!submissions) throw new Error("Submission Array Error")
+
            const submitResult = await submitBatch(submissions)
 
-       //  console.log(submitResult)
+         //  console.log("submitResult", submitResult)
 
-           let tokenStr='';
+           if (!submitResult || submitResult.length === 0) throw new Error("Submission Batch Error");
 
-           for(const element of submitResult)
-           {
-           const {token} = element;
-           
-           tokenStr += token + ',';
+           const tokenStr = submitResult.map(el => el.token).join(',');
 
-           }
+
+           if(!tokenStr) throw new Error("tokenstr Array Error")
 
            const testResult = await submitToken(tokenStr)
 
-          // console.log(testResult)
+           if(testResult.length==0) throw new Error("test Result Error Token Submission Error")
+
+         //  console.log("testResult", testResult)
+
+         const decoded = (base64Str)=>
+            {
+                if(base64Str)
+               return Buffer.from(base64Str, 'base64').toString('utf-8');
+            }
+
+         const normalResult = testResult.map((curr)=>{
+            return{
+                status_id:curr.status_id,
+                description:curr.status.description,
+                stdin:decoded(curr.stdin),
+                expected_output:decoded(curr.expected_output),
+                stdout:decoded(curr.stdout)
+            }
+         })
 
 
-          res.status(201).send(testResult)
+          res.status(201).send(normalResult)
     }
     catch(err)
     {

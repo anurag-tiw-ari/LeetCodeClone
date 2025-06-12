@@ -17,10 +17,10 @@ const submitBatch=async (submissions)=>{
       method: 'POST',
       url:'https://judge0-ce.p.rapidapi.com/submissions/batch',
       params: {
-        base64_encoded: 'false'
+        base64_encoded: 'true'
       },
       headers: {
-        'x-rapidapi-key':'29ee3e15ecmsh632a0408d7b7cd8p1cfabdjsn98195171ebc8',
+        'x-rapidapi-key':'0e972bd187msh4119df5449d3af5p1c8f6cjsnec753a0a4e2a',
         'x-rapidapi-host': 'judge0-ce.p.rapidapi.com',
         'Content-Type': 'application/json'
       },
@@ -67,11 +67,11 @@ const submitToken=async (tokenStr)=>{
     url: 'https://judge0-ce.p.rapidapi.com/submissions/batch',
     params: {
         tokens:tokenStr,
-        base64_encoded: 'false',
+        base64_encoded: 'true',
         fields: '*'
     },
     headers: {
-        'x-rapidapi-key': '29ee3e15ecmsh632a0408d7b7cd8p1cfabdjsn98195171ebc8',
+        'x-rapidapi-key': '0e972bd187msh4119df5449d3af5p1c8f6cjsnec753a0a4e2a',
         'x-rapidapi-host': 'judge0-ce.p.rapidapi.com'
       }
     };
@@ -80,14 +80,20 @@ const submitToken=async (tokenStr)=>{
         try {
             const response = await axios.request(options);
             return response.data;
-        } catch (error) {
-            console.error(error);
-        }
+        } 
+        catch (error) {
+        console.error("Judge0 400 Error:", error?.response?.data || error.message);
+        throw new Error("Judge0 token fetch failed");
+    }
     }
 
     while(true)
     {
     const result = await fetchData();
+
+     if (!result || !result.submissions) {
+        throw new Error("Invalid response from Judge0");
+    }
 
    const IsResultObtained = result.submissions.every((curr)=>{
         return curr.status_id>=3

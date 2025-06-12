@@ -9,6 +9,7 @@ import problemRouter from "./routes/problemCreator.js";
 import submitRouter from "./routes/submit.js";
 import cors from "cors";
 import aiRouter from "./routes/aiChatting.js";
+import User from "./models/user.js";
 
 const app=express()
 
@@ -43,5 +44,6 @@ const InitializeConnection= async()=>{
         console.log("Error Not Connected to DB "+err)
     }
 }
+
 
 InitializeConnection();

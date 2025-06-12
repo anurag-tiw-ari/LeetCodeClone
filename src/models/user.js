@@ -42,7 +42,14 @@ const userSchema=new Schema({
     password:{
         type:String,
         required:true
-    }
+    },
+    likedProblems:{
+        type:[{
+            type:Schema.Types.ObjectId,
+            ref:"problem",
+            unique:true
+        }],
+    },
 },{
     timestamps:true
 })
