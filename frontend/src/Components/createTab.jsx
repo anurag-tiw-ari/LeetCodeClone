@@ -17,7 +17,7 @@ const problemSchema = z.object({
       explanation: z.string().min(1, 'Explanation is required')
     })
   ).min(1, 'At least one visible test case required'),
-  hiddenTestCases: z.array(
+  hiddenVisibleTestCases: z.array(
     z.object({
       input: z.string().min(1, 'Input is required'),
       output: z.string().min(1, 'Output is required')
@@ -37,9 +37,9 @@ const problemSchema = z.object({
   ).length(3, 'All three languages required')
 });
 
-function AdminPanel() {
+export default function CreateTab() {
   const navigate = useNavigate();
-  const [activeLanguage, setActiveLanguage] = useState(0); // 0: C++, 1: Java, 2: JavaScript
+  const [activeLanguage, setActiveLanguage] = useState(0);
   const languages = ['C++', 'Java', 'JavaScript'];
 
   const {
@@ -51,14 +51,14 @@ function AdminPanel() {
     resolver: zodResolver(problemSchema),
     defaultValues: {
       startCode: [
-        { language: 'c++', initialCode: '// C++ starter code\n\nclass Solution {\npublic:\n    // Your code here\n};' },
-        { language: 'java', initialCode: '// Java starter code\n\nclass Solution {\n    // Your code here\n}' },
-        { language: 'javaScript', initialCode: '// JavaScript starter code\n\n/**\n * Your code here\n */' }
+        { language: 'C++', initialCode: '// C++ starter code\n\nclass Solution {\npublic:\n    // Your code here\n};' },
+        { language: 'Java', initialCode: '// Java starter code\n\nclass Solution {\n    // Your code here\n}' },
+        { language: 'JavaScript', initialCode: '// JavaScript starter code\n\n/**\n * Your code here\n */' }
       ],
       referenceSolution: [
-        { language: 'c++', completeCode: '// C++ solution\n\nclass Solution {\npublic:\n    // Complete solution\n};' },
-        { language: 'java', completeCode: '// Java solution\n\nclass Solution {\n    // Complete solution\n}' },
-        { language: 'javaScript', completeCode: '// JavaScript solution\n\n// Complete solution' }
+        { language: 'C++', completeCode: '// C++ solution\n\nclass Solution {\npublic:\n    // Complete solution\n};' },
+        { language: 'Java', completeCode: '// Java solution\n\nclass Solution {\n    // Complete solution\n}' },
+        { language: 'JavaScript', completeCode: '// JavaScript solution\n\n// Complete solution' }
       ]
     }
   });
@@ -66,41 +66,33 @@ function AdminPanel() {
   const {
     fields: visibleFields,
     append: appendVisible,
-    remove: removeVisible } = useFieldArray({control,name: 'visibleTestCases'});
+    remove: removeVisible 
+  } = useFieldArray({ control, name: 'visibleTestCases' });
 
   const {
     fields: hiddenFields,
     append: appendHidden,
     remove: removeHidden
-  } = useFieldArray({
-    control,
-    name: 'hiddenTestCases'
-  });
+  } = useFieldArray({ control, name: 'hiddenVisibleTestCases' });
 
   const onSubmit = async (data) => {
     try {
       await axiosClient.post('/problem/create', data);
       alert('Problem created successfully!');
-      navigate('/');
+      navigate('/admin');
     } catch (error) {
       alert(`Error: ${error.response?.data || error.message}`);
     }
   };
 
   return (
-    <div className="min-h-screen bg-base-200 p-6 mt-18">
+    <div className="p-4 w-full">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-primary">Problem Creator</h1>
-            <p className="text-sm opacity-70">Create new coding challenges for your platform</p>
+            <h1 className="text-3xl font-bold text-primary">Create New Problem</h1>
+            <p className="text-sm opacity-70">Add a new coding challenge to the platform</p>
           </div>
-          <button 
-            onClick={() => navigate('/')}
-            className="btn btn-ghost"
-          >
-            Back to Dashboard
-          </button>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -153,18 +145,18 @@ function AdminPanel() {
                       {...register('tags')}
                       className={`select select-bordered ${errors.tags ? 'select-error' : 'select-primary'}`}
                     >
-                        <option value="Array">Array</option>
-                        <option value="String">String</option>
-                        <option value="Recursion">Recusrion</option>
-                        <option value="Basic Programming">Basic Programming</option>
-                        <option value="Star Pattern">Star Pattern</option>
-                        <option value="Maths">Maths</option>
-                        <option value="LinkedList">Linked List</option>
-                        <option value="Tree">Tree</option>
-                        <option value="Graph">Graph</option>
-                        <option value="DP">DP</option>
-                        <option value="Stack">Stack</option>
-                        <option value="Queue">Queue</option>
+                      <option value="Array">Array</option>
+                      <option value="String">String</option>
+                      <option value="Recursion">Recursion</option>
+                      <option value="Basic Programming">Basic Programming</option>
+                      <option value="Star Pattern">Star Pattern</option>
+                      <option value="Maths">Maths</option>
+                      <option value="LinkedList">Linked List</option>
+                      <option value="Tree">Tree</option>
+                      <option value="Graph">Graph</option>
+                      <option value="DP">DP</option>
+                      <option value="Stack">Stack</option>
+                      <option value="Queue">Queue</option>
                     </select>
                   </div>
                 </div>
@@ -263,7 +255,7 @@ function AdminPanel() {
                             <label className="label">
                               <span className="label-text mr-2">Output</span>
                             </label>
-                            <input
+                            <textarea
                               {...register(`visibleTestCases.${index}.output`)}
                               className="input input-sm input-bordered"
                             />
@@ -352,13 +344,13 @@ function AdminPanel() {
                               <span className="label-text mr-2">Input</span>
                             </label>
                             <input
-                              {...register(`hiddenTestCases.${index}.input`)}
+                              {...register(`hiddenVisibleTestCases.${index}.input`)}
                               className="input input-sm input-bordered mt-1"
                             />
                             {errors.hiddenTestCases?.[index]?.input && (
                               <label className="label">
                                 <span className="label-text-alt text-error">
-                                  {errors.hiddenTestCases[index].input.message}
+                                  {errors.hiddenVisibleTestCases[index].input.message}
                                 </span>
                               </label>
                             )}
@@ -368,14 +360,14 @@ function AdminPanel() {
                             <label className="label">
                               <span className="label-text">Output</span>
                             </label>
-                            <input
-                              {...register(`hiddenTestCases.${index}.output`)}
+                            <textarea
+                              {...register(`hiddenVisibleTestCases.${index}.output`)}
                               className="input input-sm input-bordered mt-1"
                             />
                             {errors.hiddenTestCases?.[index]?.output && (
                               <label className="label">
                                 <span className="label-text-alt text-error">
-                                  {errors.hiddenTestCases[index].output.message}
+                                  {errors.hiddenVisibleTestCases[index].output.message}
                                 </span>
                               </label>
                             )}
@@ -389,93 +381,93 @@ function AdminPanel() {
             </div>
           </div>
 
-{/* Code Templates Section */}
-<div className="card bg-base-100 shadow-xl">
-  <div className="card-body">
-    <h2 className="card-title text-2xl">
-      <span className="bg-info w-2 h-6 mr-2 rounded-full"></span>
-      Code Templates
-    </h2>
-    <div className="divider my-0"></div>
-    
-    {/* Language Tabs */}
-    <div className="tabs tabs-boxed bg-base-200 w-fit mb-4">
-      {languages.map((lang, index) => (
-        <button
-          key={lang}
-          type="button"
-          className={`tab ${activeLanguage === index ? 'tab-active' : ''}`}
-          onClick={() => setActiveLanguage(index)}
-        >
-          {lang}
-        </button>
-      ))}
-    </div>
+          {/* Code Templates Section */}
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <h2 className="card-title text-2xl">
+                <span className="bg-info w-2 h-6 mr-2 rounded-full"></span>
+                Code Templates
+              </h2>
+              <div className="divider my-0"></div>
+              
+              {/* Language Tabs */}
+              <div className="tabs tabs-boxed bg-base-200 w-fit mb-4">
+                {languages.map((lang, index) => (
+                  <button
+                    key={lang}
+                    type="button"
+                    className={`tab ${activeLanguage === index ? 'tab-active' : ''}`}
+                    onClick={() => setActiveLanguage(index)}
+                  >
+                    {lang}
+                  </button>
+                ))}
+              </div>
 
-    <div className="space-y-6">
-      {/* Initial Code Template */}
-      {languages.map((lang, index) => (
-        <div 
-          key={`initial-${index}`}
-          className={`form-control ${activeLanguage === index ? '' : 'hidden'}`}
-        >
-          <label className="label">
-            <span className="label-text font-semibold">Initial Code Template</span>
-            <span className="label-text-alt">{lang}</span>
-          </label>
-          <div className="mockup-code bg-base-300">
-            <pre className="p-4">
-              <textarea
-                {...register(`startCode.${index}.initialCode`)}
-                className="w-full bg-transparent font-mono text-sm h-40"
-                spellCheck="false"
-              />
-            </pre>
-          </div>
-          {errors.startCode?.[index]?.initialCode && (
-            <label className="label">
-              <span className="label-text-alt text-error">
-                {errors.startCode[index].initialCode.message}
-              </span>
-            </label>
-          )}
-        </div>
-      ))}
+              <div className="space-y-6">
+                {/* Initial Code Template */}
+                {languages.map((lang, index) => (
+                  <div 
+                    key={`initial-${index}`}
+                    className={`form-control ${activeLanguage === index ? '' : 'hidden'}`}
+                  >
+                    <label className="label">
+                      <span className="label-text font-semibold">Initial Code Template</span>
+                      <span className="label-text-alt">{lang}</span>
+                    </label>
+                    <div className="mockup-code bg-base-300">
+                      <pre className="p-4">
+                        <textarea
+                          {...register(`startCode.${index}.initialCode`)}
+                          className="w-full bg-transparent font-mono text-sm h-40"
+                          spellCheck="false"
+                        />
+                      </pre>
+                    </div>
+                    {errors.startCode?.[index]?.initialCode && (
+                      <label className="label">
+                        <span className="label-text-alt text-error">
+                          {errors.startCode[index].initialCode.message}
+                        </span>
+                      </label>
+                    )}
+                  </div>
+                ))}
 
-      {/* Reference Solution */}
-      {languages.map((lang, index) => (
-        <div 
-          key={`reference-${index}`}
-          className={`form-control ${activeLanguage === index ? '' : 'hidden'}`}
-        >
-          <label className="label">
-            <span className="label-text font-semibold">Reference Solution</span>
-            <span className="label-text-alt">{lang}</span>
-          </label>
-          <div className="mockup-code bg-base-300">
-            <pre className="p-4">
-              <textarea
-                {...register(`referenceSolution.${index}.completeCode`)}
-                className="w-full bg-transparent font-mono text-sm h-40"
-                spellCheck="false"
-              />
-            </pre>
+                {/* Reference Solution */}
+                {languages.map((lang, index) => (
+                  <div 
+                    key={`reference-${index}`}
+                    className={`form-control ${activeLanguage === index ? '' : 'hidden'}`}
+                  >
+                    <label className="label">
+                      <span className="label-text font-semibold">Reference Solution</span>
+                      <span className="label-text-alt">{lang}</span>
+                    </label>
+                    <div className="mockup-code bg-base-300">
+                      <pre className="p-4">
+                        <textarea
+                          {...register(`referenceSolution.${index}.completeCode`)}
+                          className="w-full bg-transparent font-mono text-sm h-40"
+                          spellCheck="false"
+                        />
+                      </pre>
+                    </div>
+                    {errors.referenceSolution?.[index]?.completeCode && (
+                      <label className="label">
+                        <span className="label-text-alt text-error">
+                          {errors.referenceSolution[index].completeCode.message}
+                        </span>
+                      </label>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          {errors.referenceSolution?.[index]?.completeCode && (
-            <label className="label">
-              <span className="label-text-alt text-error">
-                {errors.referenceSolution[index].completeCode.message}
-              </span>
-            </label>
-          )}
-        </div>
-      ))}
-    </div>
-  </div>
-</div>
 
           <div className="flex justify-end gap-4">
-            <button type="button" className="btn btn-ghost" onClick={() => navigate('/')}>
+            <button type="button" className="btn btn-ghost" onClick={() => navigate('/admin')}>
               Cancel
             </button>
             <button type="submit" className="btn btn-primary">
@@ -490,5 +482,3 @@ function AdminPanel() {
     </div>
   );
 }
-
-export default AdminPanel;

@@ -1,3 +1,26 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+/* .navbar{
+    animation-name: topDown;
+    animation-duration: 1s;
+}
+
+@keyframes topDown {
+   0% {
+         top: -20px;
+   }
+   100%
+   {
+     top:0px
+   }
+} */
+
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}

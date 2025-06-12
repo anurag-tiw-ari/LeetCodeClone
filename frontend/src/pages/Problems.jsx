@@ -9,6 +9,7 @@ function Problems() {
   const { user } = useSelector((state) => state.auth);
   const [problems, setProblems] = useState([]);
   const [solvedProblems, setSolvedProblems] = useState([]);
+  const [likedProblems, setLikedProblems] = useState([]);
   const [filters, setFilters] = useState({
     difficulty: 'all',
     tag: 'all',
@@ -35,15 +36,28 @@ function Problems() {
       }
     };
 
+    const fetchLikedProblems = async () => {
+      try {
+        const { data } = await axiosClient.get('/problem/likedProblemsByUser');
+        setLikedProblems(data);
+      } catch (error) {
+        console.error('Error fetching solved problems:', error);
+      }
+    };
+
     fetchProblems();
-    if (user) fetchSolvedProblems();
+    if (user) 
+      {
+        fetchSolvedProblems();
+        fetchLikedProblems();
+      }
   }, []);
 
   const filteredProblems = problems.filter((problem) => {
     const difficultyMatch = filters.difficulty === 'all' || problem.difficulty === filters.difficulty;
     const tagMatch = filters.tag === 'all' || problem.tags === filters.tag;
-    const statusMatch = filters.status === 'all' || 
-                      solvedProblems.some(sp => sp._id === problem._id);
+    const statusMatch = filters.status === 'all' || filters.status === 'solved' && solvedProblems.some(sp => sp._id === problem._id) || 
+    filters.status === 'liked' && likedProblems.some(lp => lp._id === problem._id);
     return difficultyMatch && tagMatch && statusMatch;
   });
 
@@ -82,6 +96,7 @@ function Problems() {
               >
                 <option value="all">All Problems</option>
                 <option value="solved">Solved Problems</option>
+                <option value="liked">Liked Problems</option>
               </select>
             </div>
 
@@ -164,23 +179,24 @@ function Problems() {
                         </NavLink>
                       </h2>
                       <div className="flex flex-wrap gap-2 mt-2">
-                        <div className={`badge ${getDifficultyBadgeColor(problem.difficulty)}`}>
+                        <div className={`badge ${getDifficultyBadgeColor(problem.difficulty)} border-gray-700`}>
                           {problem.difficulty}
                         </div>
-                        <div className="badge badge-outline">
+                        <div className="badge border-gray-700">
                           {problem.tags}
                         </div>
                       </div>
                     </div>
                     
-                    {solvedProblems.some(sp => sp._id === problem._id) && (
-                      <div className="badge badge-success gap-2 px-4 py-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
+                    {solvedProblems.some(sp => sp._id === problem._id) ? (
+                      <div className="badge badge-success gap-2 px-4 py-3 hover:bg-green-300">
                         Solved
                       </div>
-                    )}
+                    ) : ( <div className="badge bg-white gap-2 px-5 py-3 text-green-950 hover:bg-green-300">
+                        <NavLink to={`/problem/${problem._id}`}>
+                           Solve
+                        </NavLink>
+                      </div>)}
                   </div>
                 </div>
               </div>
@@ -200,9 +216,9 @@ function Problems() {
 
 const getDifficultyBadgeColor = (difficulty) => {
   switch (difficulty.toLowerCase()) {
-    case 'easy': return 'badge-success';
-    case 'medium': return 'badge-warning';
-    case 'hard': return 'badge-error';
+    case 'easy': return 'text-success';
+    case 'medium': return 'text-warning';
+    case 'hard': return 'text-error';
     default: return 'badge-neutral';
   }
 };

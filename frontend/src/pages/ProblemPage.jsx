@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axiosClient from '../utils/axiosClient';
 import Editor from '@monaco-editor/react';
-import { useParams } from 'react-router';
+import { Navigate, useParams } from 'react-router';
 import { FaPlay, FaCheck, FaTimes, FaExclamationTriangle, FaCode } from 'react-icons/fa';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { NavLink } from 'react-router';
 import ChatAI from '../Components/ChatAI';
 import { FaFileAlt,FaBook,FaHistory,FaRobot,FaArrowLeft } from 'react-icons/fa';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { useNavigate } from 'react-router';
 
 
 const ProblemPage = () => {
@@ -33,6 +34,8 @@ const ProblemPage = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [codeByLanguage, setCodeByLanguage] = useState({});
 
+  const navigate = useNavigate();
+
   const languageToMonacoId = {
     'C++': 'cpp',
     'Java': 'java',
@@ -54,6 +57,9 @@ const ProblemPage = () => {
         const response = await axiosClient.get(`/problem/getProblemById/${id}`);
         setProblem(response.data);
         
+        const likedResponse = await axiosClient.get(`/problem/checkLike/${id}`);
+        setIsLiked(likedResponse.data);
+
         const initialCodes = {};
         response.data.startCode.forEach(sc => {
           initialCodes[sc.language] = sc.initialCode || '';
@@ -138,8 +144,16 @@ const handleSubmitCode = async () => {
     }
 };
 
-  const handleLike = async () =>{
-     setIsLiked(!isLiked)
+const handleLike = async () =>{
+
+     try{
+       const result = await axiosClient.get(`/problem/likedProblem/${id}`);
+       setIsLiked(!isLiked)
+     }
+     catch(err)
+     {
+        toast.error(err?.response?.data)
+     }
   }
 
   const getDifficultyColor = (difficulty) => {
@@ -172,6 +186,12 @@ const handleSubmitCode = async () => {
           >
             Try Again
           </button>
+          <button 
+            onClick={() => navigate("/")}
+            className="btn btn-accent w-full"
+          >
+            HomePage
+          </button>
         </div>
       </div>
     </div>
@@ -184,7 +204,7 @@ const handleSubmitCode = async () => {
   );
 
   return (
-    <div className="flex flex-col h-screen bg-base-100 text-base-content overflow-hidden mt-18">
+    <div className="flex flex-col h-screen bg-base-100 text-base-content overflow-hidden fixed z-15 inset-0">
       {/* Mobile Header */}
       {isMobileView && (
         <div className="flex items-center justify-between p-3 border-b border-base-300 bg-base-200">
@@ -200,6 +220,14 @@ const handleSubmitCode = async () => {
             <option value="Java">Java</option>
             <option value="JavaScript">JavaScript</option>
           </select>
+           <div className="flex">
+                    <button
+                      onClick={handleLike}
+                      className={`text-[17px] ${isLiked ? "text-red-500" : "text-gray-400"} `}
+                    >
+                      {isLiked ? <FaHeart /> : <FaRegHeart/>}
+                    </button>
+                  </div>
         </div>
       )}
 
@@ -408,7 +436,7 @@ const handleSubmitCode = async () => {
                   <div className="flex space-x-2">
                     <button
                       onClick={handleLike}
-                      className={`text-xl ${isLiked ? "text-red-500" : ""} `}
+                      className={`text-xl ${isLiked ? "text-red-500" : "text-gray-400"} `}
                     >
                       {isLiked ? <FaHeart /> : <FaRegHeart/>}
                     </button>
@@ -491,7 +519,7 @@ const handleSubmitCode = async () => {
                             <div className="flex justify-between items-center mb-3">
                               <span className="font-medium">Test Case {index + 1}</span>
                               <span className={`badge ${
-                                result.status_id === 3 ? 'badge-success' : 'badge-error'
+                                result.status_id === 3 ? 'text-success' : 'text-error'
                               }`}>
                                 {result.status_id === 3 ? 'Passed' : 'Failed'}
                               </span>
@@ -515,7 +543,7 @@ const handleSubmitCode = async () => {
                                 <div>
                                   <div className="text-xs text-base-content/70 mb-1">Your Output</div>
                                   <pre className={`p-2 rounded whitespace-pre-wrap text-xs ${
-                                    result.status_id === 3 ? 'bg-success/20' : 'bg-error/20'
+                                    result.status_id === 3 ? 'bg-success' : 'bg-error'
                                   }`}>
                                     {result.stdout || 'No output'}
                                   </pre>
@@ -526,7 +554,7 @@ const handleSubmitCode = async () => {
                             {result.status_id !== 3 && (
                               <div className="mt-3">
                                 <div className="text-xs text-base-content/70 mb-1">Error</div>
-                                <pre className="bg-error/20 p-2 rounded whitespace-pre-wrap text-xs">
+                                <pre className="bg-error p-2 rounded whitespace-pre-wrap text-xs">
                                   {result.stderr || 'Wrong answer'}
                                 </pre>
                               </div>
@@ -824,7 +852,7 @@ const handleSubmitCode = async () => {
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-xs font-medium">Case {index + 1}</span>
                       <span className={`badge badge-xs ${
-                        result.status_id === 3 ? 'badge-success' : 'badge-error'
+                        result.status_id === 3 ? 'text-success' : 'text-error'
                       }`}>
                         {result.status_id === 3 ? 'Passed' : 'Failed'}
                       </span>
@@ -848,7 +876,7 @@ const handleSubmitCode = async () => {
                       <div>
                         <div className="text-xs text-base-content/70 mb-0.5">Your Output</div>
                         <pre className={`p-1 rounded whitespace-pre-wrap text-xs ${
-                          result.status_id === 3 ? 'bg-success/20' : 'bg-error/20'
+                          result.status_id === 3 ? 'bg-success' : 'bg-error'
                         }`}>
                           {result.stdout || 'No output'}
                         </pre>

@@ -25,22 +25,22 @@ function Header()
     }
 
     return(
-      <div className="navbar bg-base-100 shadow-xl fixed top-0 px-8 z-5 ">
+      <div className="navbar bg-base-100 shadow-xl fixed top-0 sm:px-8 z-5 px-3 ">
         <div className="flex-1">
-            <a className="btn btn-primary btn-sm lg:text-xl text-xs ">Coding Platform</a>
+            <a className="btn btn-primary btn-xs text-sm ">Coding Platform</a>
         </div>
-        <div className="flex-none">
+        <div className="flex items-center">
             <ul className="menu menu-horizontal px-1">
                 { 
                 isAuthenticated && user?.role=='admin' ? 
-                 <li><Link to="/admin" className="btn mr-2">Admin Dashboard</Link></li> : null
+                 <li><Link to="/admin" className="btn mr-2 btn-sm">Admin Dashboard</Link></li> : null
                 }
       <li>
                 <details>
-                <summary className="btn btn-soft">{user?.firstName || "Profile"}</summary>
+                <summary className="btn btn-sm">{user?.firstName || "Profile"}</summary>
                 <ul className="bg-base-100 rounded-t-none p-2 ">
                     <li>{/* The button to open modal */}
-                    <label htmlFor="my_modal_6" className="btn btn-soft " onClick={handleSignUp}>{isAuthenticated? "Log Out":"Sign Up"}</label>
+                    <label htmlFor="my_modal_6" className="btn btn-soft btn-sm" onClick={handleSignUp}>{isAuthenticated? "Log Out":"Sign Up"}</label>
                     </li>
                 </ul>
                 </details>
@@ -48,7 +48,7 @@ function Header()
             </ul>
         </div>
          <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-        <div className="w-10 rounded-full">
+        <div className="w-8 rounded-full">
           <img
             alt="Tailwind CSS Navbar component"
             src={ user?.image ? user.image : "https://th.bing.com/th/id/OIP.-OwdeGjbVmQWf62Ynk9_8AHaHa?r=0&w=720&h=720&rs=1&pid=ImgDetMain"} />
@@ -58,7 +58,7 @@ function Header()
                         <input type="checkbox" id="my_modal_6" className="modal-toggle" />
                         <div className="modal top-0 left-0 fixed justify-center items-center h-screen w-screen" role="dialog">
                         <div className="modal-box">
-                            <p className="py-4 text-2xl text-center">Are you sure you want to logout?</p>
+                            <p className="py-2 text-2xl text-center leading-0.8">Are You Sure You Want To Logout?</p>
                             <div className="modal-action flex justify-evenly">
                                 <label htmlFor="my_modal_6" className="btn btn-primary">NO</label>
                             <label onClick={handleLogOut} className="btn btn-md btn-soft">Log Out</label>

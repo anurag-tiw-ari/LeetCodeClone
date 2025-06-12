@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import axiosClient from "../utils/axiosClient"; // Make sure to import axiosClient
+import axiosClient from "../utils/axiosClient";
+import ReactMarkdown from 'react-markdown'; // For better formatting of model responses
+import remarkGfm from 'remark-gfm'; // For GitHub Flavored Markdown support
 
 const ChatAI = ({ problem }) => {
   const [messages, setMessages] = useState([
@@ -22,7 +24,6 @@ const ChatAI = ({ problem }) => {
   const onSubmit = async (data) => {
     const userMessage = { role: 'user', parts: [{ text: data.input }] };
     
-    // Optimistically update UI with user message
     setMessages(prev => [...prev, userMessage]);
     reset({ input: '' });
 
@@ -30,7 +31,7 @@ const ChatAI = ({ problem }) => {
 
     try {
       const response = await axiosClient.post("/ai/chat", {
-        messages: [...messages, userMessage], // Include the new user message
+        messages: [...messages, userMessage],
         title: problem.title,
         description: problem.description,
         testCases: problem.visibleTestCases,
@@ -52,13 +53,37 @@ const ChatAI = ({ problem }) => {
     }
   };
 
+  // Function to format code blocks in the model's response
+  const renderMessagePart = (part) => {
+    if (part.text) {
+      return (
+        <ReactMarkdown 
+          remarkPlugins={[remarkGfm]}
+          components={{
+            code({node, inline, className, children, ...props}) {
+              return inline ? (
+                <code className="bg-base-100 px-1 py-0.5 rounded">{children}</code>
+              ) : (
+                <pre className="bg-base-100 p-3 rounded-lg overflow-x-auto">
+                  <code>{children}</code>
+                </pre>
+              );
+            }
+          }}
+        >
+          {part.text}
+        </ReactMarkdown>
+      );
+    }
+    return null;
+  };
+
   return (
-    <div className="card w-full max-w-2xl mx-auto bg-base-100 shadow-xl mt-3 mb-4" id="AiChat">
-      <div className="card-body">
-        <h2 className="card-title">AI Coding Assistant</h2>
+    <div className="card w-full max-w-2xl mx-auto bg-base-100 shadow-xl mt-3 h-[calc(100vh-16rem)] lg:h-[calc(100vh-12rem)]" id="AiChat">
+      <div className="card-body flex flex-col h-full">
         
         <div 
-          className="bg-base-200 rounded-box p-4 h-96 overflow-y-auto hide-scrollbar" 
+          className="bg-base-200 rounded-box p-4 overflow-y-auto hide-scrollbar flex-grow" 
           ref={messageRef}
         >
           {messages.map((msg, idx) => (
@@ -70,10 +95,14 @@ const ChatAI = ({ problem }) => {
                 className={`chat-bubble ${
                   msg.role === "user" 
                     ? "chat-bubble-primary" 
-                    : "bg-base-300"
+                    : "bg-base-300 text-base-content"
                 }`}
               >
-                {msg.parts[0].text}
+                {msg.parts.map((part, partIdx) => (
+                  <div key={partIdx} className="whitespace-pre-wrap">
+                    {renderMessagePart(part)}
+                  </div>
+                ))}
               </div>
             </div>
           ))}
