@@ -8,7 +8,9 @@ import StatsTab from "../Components/StatsTab";
 import CreateTab from "../Components/createTab";
 import UpdateTab from "../Components/updateTab";
 import DeleteTab from "../Components/DeleteTab";
+import VideoTab from "../Components/VideoTab";
 import { useNavigate } from "react-router";
+import { RiVideoOnAiLine } from "react-icons/ri";
 
 
 function AdminPage() {
@@ -96,6 +98,12 @@ function AdminPage() {
                         >
                             <MdDeleteOutline className="mr-2" /> Delete
                         </button>
+                        <button 
+                            className={`tab ${activeTab === 'video' ? 'tab-active' : ''}`}
+                            onClick={() => setActiveTab('video')}
+                        >
+                            <RiVideoOnAiLine className="mr-2" /> Video
+                        </button>
                     </div>
                 </div>
 
@@ -115,6 +123,10 @@ function AdminPage() {
 
                     <div style={{ display: activeTab === 'delete' ? 'block' : 'none' }}>
                         <DeleteTab  problems={problems} createdProblems={createdProblems} />
+                    </div>
+
+                    <div style={{ display: activeTab === 'video' ? 'block' : 'none' }}>
+                        <VideoTab  problems={problems} createdProblems={createdProblems} />
                     </div>
                 </div>
             </div>
