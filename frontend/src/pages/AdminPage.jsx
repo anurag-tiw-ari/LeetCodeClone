@@ -11,6 +11,8 @@ import DeleteTab from "../Components/DeleteTab";
 import VideoTab from "../Components/VideoTab";
 import { useNavigate } from "react-router";
 import { RiVideoOnAiLine } from "react-icons/ri";
+import { IoCreateOutline } from "react-icons/io5";
+import ContentTab from "../Components/ContentTab";
 
 
 function AdminPage() {
@@ -68,6 +70,8 @@ function AdminPage() {
                         <option value="create">Create</option>
                         <option value="update">Update</option>
                         <option value="delete">Delete</option>
+                        <option value="video">Video</option>
+                        <option value="content">Content</option>
                     </select>
                 </div>
 
@@ -104,6 +108,12 @@ function AdminPage() {
                         >
                             <RiVideoOnAiLine className="mr-2" /> Video
                         </button>
+                         <button 
+                            className={`tab ${activeTab === 'content' ? 'tab-active' : ''}`}
+                            onClick={() => setActiveTab('content')}
+                        >
+                            <IoCreateOutline className="mr-2" /> Content
+                        </button>
                     </div>
                 </div>
 
@@ -127,6 +137,9 @@ function AdminPage() {
 
                     <div style={{ display: activeTab === 'video' ? 'block' : 'none' }}>
                         <VideoTab  problems={problems} createdProblems={createdProblems} />
+                    </div>
+                    <div style={{ display: activeTab === 'content' ? 'block' : 'none' }}>
+                        <ContentTab />
                     </div>
                 </div>
             </div>
