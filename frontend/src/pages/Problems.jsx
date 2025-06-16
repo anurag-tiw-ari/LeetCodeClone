@@ -77,6 +77,7 @@ function Problems() {
     <div className="min-h-screen bg-base-200 pt-20">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
+        <div></div>
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-primary">Problem Set</h1>
           <p className="text-base-content/70 mt-2">Practice to improve your skills</p>

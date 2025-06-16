@@ -11,6 +11,10 @@ import Problems from "./pages/Problems.jsx";
 import Footer from "./Components/Footer.jsx";
 import ProblemPage from "./pages/ProblemPage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
+import YearHeatmap from "./Components/heatMap.jsx";
+import UserProfile from "./pages/UserProfile.jsx";
+import TopicContent from "./pages/TopicContent.jsx"
+import ArticlePage from "./pages/ArticlePage.jsx";
 
 function App()
 {
@@ -50,6 +54,10 @@ function App()
         <Route path="/problems" element={isAuthenticated ? <Problems/> : <Navigate to="/signup"/>} />
         <Route path="/problem/:id" element={<ProblemPage/>}/>
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/userprofile" element={<UserProfile />}></Route>
+        <Route path="/content/:topic" element ={<TopicContent />}></Route>
+        <Route path="/content/:topic/:id" element ={<ArticlePage />}></Route>
+        Route
       </Routes>
     </>
   )
