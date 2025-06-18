@@ -13,7 +13,8 @@ const contentSchema = new Schema( {
         reuired:true
     },
     title:{
-        type:String
+        type:String,
+        required:true,
     },
     ContentCreator:{
         type:Schema.Types.ObjectId,
