@@ -50,6 +50,21 @@ const userSchema=new Schema({
             unique:true
         }],
     },
+
+    followers:{
+       type:[{
+            type:Schema.Types.ObjectId,
+            ref:"user",
+            unique:true
+        }],
+    },
+    following:{
+        type:[{
+            type:Schema.Types.ObjectId,
+            ref:"user",
+            unique:true
+        }],
+    }
 },{
     timestamps:true
 })
