@@ -2,6 +2,7 @@ import Problem from "../models/problem.js";
 import Submission from "../models/submission.js";
 import User from "../models/user.js";
 import {getLanguageById,submitBatch,submitToken} from "../utils/problemUtility.js";
+import SolutionVideo from "../models/SolutionVideo.js";
 
 const createProblem = async (req,res)=>{
     const{title,description,difficulty,tags,visibleTestCases,
@@ -212,6 +213,17 @@ const getProblemById = async (req,res)=>{
        if(!foundProblem)
         throw new Error("Problem is missing")
 
+       const videos = await SolutionVideo.findOne({problemId:id});
+       
+          if(videos){    
+          foundProblem.secureUrl = videos.secureUrl;
+          foundProblem.cloudinaryPublicId = videos.cloudinaryPublicId;
+          foundProblem.thumbnailUrl = videos.thumbnailUrl;
+          foundProblem.duration = videos.duration;
+       
+          return res.status(200).send(foundProblem);
+          }
+
         res.status(200).send(foundProblem)
     }
     catch(err)
@@ -390,4 +402,29 @@ const problemsCreatedByAdmin = async (req,res)=>{
 
 }
 
-export {createProblem,updateProblem,deleteProblem,getProblemById,getAllProblems,solvedProblemsByUser,submittedProblem,likedProblems,checkLike,getLikedProblemsByUser,problemsCreatedByAdmin}
+const solvedProblemsByAnotherUser = async (req,res)=>
+    {
+        try{
+         const user= await User.findById(req.params.id).populate({
+            path:"problemSolved",
+            select:"_id title difficulty tags"
+         });
+
+         if(!user)
+         {
+            throw new Error("user does not exist")
+         }
+
+        //  console.log(user.firstName)
+        //  console.log(user.problemSolved)
+
+         res.status(201).send(user.problemSolved)
+         
+        }
+        catch(err)
+        {
+            res.status(400).send("Error:"+err)
+        }
+}
+
+export {createProblem,updateProblem,deleteProblem,getProblemById,getAllProblems,solvedProblemsByUser,submittedProblem,likedProblems,checkLike,getLikedProblemsByUser,problemsCreatedByAdmin,solvedProblemsByAnotherUser}

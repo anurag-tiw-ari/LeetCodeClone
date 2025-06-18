@@ -222,13 +222,15 @@ const runCode = async(req,res)=>{
 
            if(testResult.length==0) throw new Error("test Result Error Token Submission Error")
 
-         //  console.log("testResult", testResult)
+           
 
          const decoded = (base64Str)=>
             {
                 if(base64Str)
                return Buffer.from(base64Str, 'base64').toString('utf-8');
             }
+
+           console.log("testResult", testResult)
 
          const normalResult = testResult.map((curr)=>{
             return{
