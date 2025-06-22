@@ -70,6 +70,10 @@ const problemSchema = new Schema({
             required:true
         }
     }],
+    potdDate:{
+       type:Date,
+       default:null
+    },
     problemCreator:{
         type:Schema.Types.ObjectId,
         ref:'user',

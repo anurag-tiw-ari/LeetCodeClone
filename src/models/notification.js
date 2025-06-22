@@ -23,6 +23,12 @@ const notificationSchema = new Schema({
         type: Schema.Types.ObjectId, 
         ref: 'content', 
         required: true 
+    },
+    commentId:
+    {
+        type: Schema.Types.ObjectId, 
+        ref: 'contentcomment', 
+        required: true 
     }
 },
 {

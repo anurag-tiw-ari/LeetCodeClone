@@ -64,7 +64,37 @@ const userSchema=new Schema({
             ref:"user",
             unique:true
         }],
-    }
+    },
+    streak:{
+        lastActive:{
+            type:Date,
+        },
+        current:{
+            type:Number,
+            default:0
+        },
+        max:{
+            type:Number,
+            default:0
+        }
+    },
+    codingScore:{
+        type:Number,
+        default:0
+    },
+    battlesPlayed: { 
+        type: Number, 
+        default: 0 
+    },
+    battlesWon: { 
+        type: Number, 
+        default: 0 
+    },
+    coins: { 
+        type: Number, 
+        default: 500 
+    } 
+
 },{
     timestamps:true
 })
