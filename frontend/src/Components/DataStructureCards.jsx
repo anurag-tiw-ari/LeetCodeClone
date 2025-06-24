@@ -66,7 +66,11 @@ function DataStructureCards() {
   };
 
   return (
-    <div className="min-h-screen bg-base-300 py-24 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-base-300 py-24 px-4 sm:px-6 lg:px-8" id="learnDSA">
+       <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500 rounded-full filter blur-3xl opacity-10"></div>
+        <div className="absolute bottom-1/3 right-1/3 w-72 h-72 bg-cyan-500 rounded-full filter blur-3xl opacity-10"></div>
+      </div>
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -74,7 +78,7 @@ function DataStructureCards() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-200 to-gray-400 mb-4">
+          <h1 className="text-5xl sm:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-200 to-gray-400 mb-4">
             Learn And Visulaize
           </h1>
         </motion.div>
