@@ -2,75 +2,69 @@ import React from "react";
 
 function HomePageMarquee() {
   return (
-    <div className="bg-base-300 text-base-content pb-20 overflow-x-hidden">
-      <div className="overflow-hidden py-6">
-        {/* First marquee line - left to right */}
-        <div className="relative flex w-full overflow-hidden">
-          <div className="animate-marquee whitespace-nowrap text-5xl sm:text-9xl font-bold uppercase tracking-wider">
-            <span className="mx-8 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              VISUALISE DSA NEVER LIKE BEFORE
-            </span>
-             <span className="mx-8 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              VISUALISE DSA NEVER LIKE BEFORE
-            </span>
-            <span className="mx-8 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              VISUALISE DSA NEVER LIKE BEFORE
-            </span>
-          </div>
-        </div>
+    <div className="bg-base-300 py-16 overflow-hidden relative">
+      {/* Glow effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-60">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary rounded-full filter blur-3xl opacity-10"></div>
+        <div className="absolute bottom-1/3 right-1/3 w-72 h-72 bg-secondary rounded-full filter blur-3xl opacity-10"></div>
+      </div>
 
-        {/*Second marquee line - right to left */}
-         <div className="relative mt-4 flex w-full overflow-hidden">
-          <div className="animate-marquee-reverse whitespace-nowrap text-3xl sm:text-5xl font-bold uppercase tracking-wider">
-            <span className="mx-8 font-bold tracking-tight text-transparent 
-[-webkit-text-stroke:1px_rgba(229,231,235,0.6)] [text-stroke:1px_rgba(209,213,219,0.3)]
-[text-shadow:_0_0_12px_rgba(229,231,235,0.3),_0_0_4px_rgba(209,213,219,0.4)]
-bg-gradient-to-r from-gray-300 to-gray-100 bg-clip-text">
-              ARRAY . LINKEDLIST . TREE . GRAPH . STACK . QUEUE
-            </span>
-             <span className="mx-8 font-bold tracking-tight text-transparent 
-[-webkit-text-stroke:1px_rgba(229,231,235,0.6)] [text-stroke:1px_rgba(209,213,219,0.3)]
-[text-shadow:_0_0_12px_rgba(229,231,235,0.3),_0_0_4px_rgba(209,213,219,0.4)]
-bg-gradient-to-r from-gray-300 to-gray-100 bg-clip-text">
-              ARRAY . LINKEDLIST . TREE . GRAPH . STACK . QUEUE
-            </span>
-           <span className="mx-8 font-bold tracking-tight text-transparent 
-[-webkit-text-stroke:1px_rgba(229,231,235,0.6)] [text-stroke:1px_rgba(209,213,219,0.3)]
-[text-shadow:_0_0_12px_rgba(229,231,235,0.3),_0_0_4px_rgba(209,213,219,0.4)]
-bg-gradient-to-r from-gray-300 to-gray-100 bg-clip-text">
-              ARRAY . LINKEDLIST . TREE . GRAPH . STACK . QUEUE
-            </span>
+      {/* First marquee - primary gradient */}
+      <div className="relative mb-8">
+        <div className="flex overflow-hidden">
+          <div className="flex items-center animate-marquee whitespace-nowrap py-4">
+            {[...Array(4)].map((_, i) => (
+              <span 
+                key={`line1-${i}`} 
+                className="mx-8 text-4xl sm:text-6xl md:text-7xl font-bold uppercase tracking-tighter bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+              >
+                Learn DSA LIKE NEVER BEFORE
+              </span>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Custom animation styles */}
+      {/* Second marquee - subtle outline effect */}
+      <div className="relative">
+        <div className="flex overflow-hidden">
+          <div className="flex items-center animate-marquee-reverse whitespace-nowrap py-2">
+            {[...Array(4)].map((_, i) => (
+              <span 
+                key={`line2-${i}`}
+                className="mx-8 text-2xl sm:text-4xl md:text-5xl font-bold uppercase tracking-tight text-transparent [-webkit-text-stroke:1px] [-webkit-text-stroke-color:oklch(var(--bc)/0.2)]"
+              >
+                <span className="text-primary/70">ARRAY</span> • 
+                <span className="text-secondary/70"> LINKEDLIST</span> • 
+                <span className="text-accent/70"> TREE</span> • 
+                <span className="text-primary/70"> GRAPH</span> • 
+                <span className="text-secondary/70"> STACK</span> • 
+                <span className="text-accent/70"> QUEUE</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Animation styles */}
       <style jsx>{`
         @keyframes marquee {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
         @keyframes marquee-reverse {
-          0% {
-            transform: translateX(-50%);
-          }
-          100% {
-            transform: translateX(0);
-          }
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
         }
         .animate-marquee {
-          animation: marquee 40s linear infinite;
+          animation: marquee 30s linear infinite;
         }
         .animate-marquee-reverse {
-          animation: marquee-reverse 40s linear infinite;
+          animation: marquee-reverse 30s linear infinite;
         }
       `}</style>
     </div>
   );
-};
+}
 
 export default HomePageMarquee;

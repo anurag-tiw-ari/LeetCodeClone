@@ -3,7 +3,7 @@ import axiosClient from '../utils/axiosClient';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
 
-export default function YearHeatmap() {
+export default function YearHeatmap({id}) {
   const [availableYears, setAvailableYears] = useState([]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [heatmapData, setHeatmapData] = useState([]);
@@ -32,7 +32,7 @@ export default function YearHeatmap() {
     try {
       setLoading(true);
       setError(null);
-      const response = await axiosClient.post('/user/heatMap', { year });
+      const response = await axiosClient.post(`/user/heatMap/${id}`, { year });
       setHeatmapData(response.data);
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Failed to load heatmap data');
