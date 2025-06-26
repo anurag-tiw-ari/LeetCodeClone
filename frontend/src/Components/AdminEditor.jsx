@@ -6,16 +6,95 @@ import { EditorProvider, useCurrentEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import React, { useState } from 'react'
 import axiosClient from '../utils/axiosClient'
+import Image from '@tiptap/extension-image'
 import { toast } from 'react-toastify'
+import axios from 'axios'
 
 const MenuBar = ({topic,title}) => {
   const { editor } = useCurrentEditor()
   const [loading,setLoading] = useState(false)
   const [submitted,setSubmitted] = useState("")
+  const [uploadProgress,setUploadProgress] = useState(null)
+
 
   if (!editor) {
     return null
   }
+
+    const addImage = async () => {
+    // 1. Get upload credentials from backend
+    try {
+      const Signatureresponse = await axiosClient.get('/image/create');
+      const { upload_url, public_id, signature, timestamp, api_key, cloud_name } = Signatureresponse.data
+      
+      // 2. Create file input dynamically
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.click();
+      
+      input.onchange = async () => {
+        if (input.files && input.files[0]) {
+              const file = input.files[0];
+            try{
+
+          if(file.size>5 * 1024 * 1024)
+          {
+            throw new Error("File Size Must be less than 5MB")
+          }
+
+          if(!file.type.startsWith('image/'))
+          {
+            throw new Error("Only Images are allow")
+          }
+        }
+        catch(err)
+        {
+            toast.error(err.message)
+        }
+          
+          // 3. Upload the file to the cloud service
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('api_key', api_key);
+          formData.append('signature', signature);
+          formData.append('timestamp', timestamp);
+          formData.append('public_id', public_id);
+          
+          try {
+            const uploadResponse = await axios.post(upload_url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: (progressEvent) => {
+          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(progress);
+        },
+      });
+            
+            const result = uploadResponse.data;
+            
+            if (result.secure_url) {
+              // 4. Insert image into editor
+              editor.chain().focus().setImage({ src: result.secure_url }).run();
+            }
+
+            setUploadProgress(null)
+          } catch (uploadError) {
+            console.error('Upload failed:', uploadError);
+            setUploadProgress(null)
+          }
+        }
+      };
+      
+    } catch (error) {
+      console.error('Failed to get upload credentials:', error);
+    }
+    finally {
+  setUploadProgress(null); // 300ms delay
+}
+
+  };
 
   const handleContentSubmit = async () => {
     setLoading(true)
@@ -51,6 +130,7 @@ const MenuBar = ({topic,title}) => {
   ]
 if(submitted!="") return (<> <div className='p-4 bg-success'>{submitted}</div></>)
   return (
+    <>
     <div className="editor-menu bg-gray-900 border-b border-gray-200 px-2 sm:px-4 rounded-t-lg">
       <div className="flex flex-wrap items-center gap-1 sm:gap-2 justify-between">
         {/* Text formatting */}
@@ -92,6 +172,38 @@ if(submitted!="") return (<> <div className='p-4 bg-success'>{submitted}</div></
             </svg>
           </button>
         </div>
+
+            {uploadProgress ? (
+   <div className="flex items-center gap-2 w-full sm:w-auto">
+    <div className="relative w-6 h-6">
+      {/* Background circle */}
+      <div className="absolute w-6 h-6 rounded-full border-2 border-gray-700"></div>
+      {/* Progress circle - using conic-gradient */}
+      <div 
+        className="absolute w-6 h-6 rounded-full"
+        style={{
+          background: `conic-gradient(#3B82F6 ${uploadProgress * 3.6}deg, transparent 0deg)`
+        }}
+      ></div>
+      {/* Percentage text in center */}
+      <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-medium text-gray-300">
+        {uploadProgress}
+      </span>
+    </div>
+  </div>
+):(<div className="flex items-center gap-1 bg-gray-800 btn btn-sm rounded-md shadow-sm">
+            <button
+            onClick={addImage}
+            className= 'hover:bg-gray-200 hover:text-gray-800'
+          title="Insert Image"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+        </button>
+        </div>)}
 
         {/* Headings - Changed to dropdown on small screens */}
         <div className="dropdown dropdown-hover">
@@ -249,6 +361,7 @@ if(submitted!="") return (<> <div className='p-4 bg-success'>{submitted}</div></
         </div>
       </div>
     </div>
+    </>
   )
 }
 
@@ -265,38 +378,15 @@ const extensions = [
       keepAttributes: false,
     },
   }),
+  Image.configure({
+    inline: true,
+    allowBase64: false,
+    HTMLAttributes: {
+      class: 'rounded-md border max-w-full h-auto',
+    },
+  }),
 ]
 
-// const content = `
-// <h2>
-//   Hi there,
-// </h2>
-// <p>
-//   this is a <em>basic</em> example of <strong>Tiptap</strong>. Sure, there are all kind of basic text styles you'd probably expect from a text editor. But wait until you see the lists:
-// </p>
-// <ul>
-//   <li>
-//     That's a bullet list with one …
-//   </li>
-//   <li>
-//     … or two list items.
-//   </li>
-// </ul>
-// <p>
-//   Isn't that great? And all of that is editable. But wait, there's more. Let's try a code block:
-// </p>
-// <pre><code class="language-css">body {
-//   display: none;
-// }</code></pre>
-// <p>
-//   I know, I know, this is impressive. It's only the tip of the iceberg though. Give it a try and click a little bit around. Don't forget to check the other examples too.
-// </p>
-// <blockquote>
-//   Wow, that's amazing. Good work! 👏
-//   <br />
-//   — Your Team
-// </blockquote>
-// `
 
 export default ({topic,title,content}) => {
 
